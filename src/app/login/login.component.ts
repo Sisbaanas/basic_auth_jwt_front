@@ -7,11 +7,9 @@ import { map, tap } from 'rxjs';
 export class User{
   email: String | undefined;
   password: String | undefined;
-  constructor()
-  {
-  }
- 
+  constructor(){}
 }
+
 
 @Component({
   selector: 'app-login',
@@ -19,10 +17,13 @@ export class User{
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
+ 
+  // change to true to show the 'wrong input' message
+  wrong:Boolean=false;
 
   myform: FormGroup = this.fb.group({
     username: ['', ],
-    password: ['', Validators.minLength(5)]
+    password: ['', ]
   });  
 
   the_user:User = new User();
@@ -33,7 +34,6 @@ export class LoginComponent implements OnInit {
 
   
   constructor(private fb: FormBuilder,private  httpClient:HttpClient) { 
-    
   }
 
   ngOnInit(): void {
@@ -46,17 +46,25 @@ export class LoginComponent implements OnInit {
     const formvalue = this.myform.value;
     console.log(formvalue)
 
-    this.the_user.email="test1";
-    this.the_user.password="password";
+    this.the_user.email=this.myform.value.username;
+    this.the_user.password=this.myform.value.password;
 
-    this.httpClient.post<any>('http://localhost:8080/login' ,this.the_user,{headers: new HttpHeaders, observe: "response"}).subscribe(
+    try {
+      this.httpClient.post<any>('http://localhost:8080/login' ,this.the_user,{ observe: "response"}).subscribe(
       response=>{
-        console.log("headers : " + response.headers.get("Authorization"))
-       // localStorage.setItem("Authorization",response.headers.get("Authorization"));
-      })
-    console.log("**************************")
+        console.log(response.headers.get("Authorization"))
 
-  //  window.location.href = "home"
+        localStorage.setItem("Authorization", String(response.headers.get("Authorization"))  );
+        console.log("sot : " + localStorage.getItem("Authorization"))
+        window.location.href = "home"
+
+      })
+    } catch (error) {}
+
+
+    this.wrong= true
+      console.log(this.wrong)
+    console.log("**************************")
   }
 
   async submitHandler() {

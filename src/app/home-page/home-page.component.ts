@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 
 
@@ -19,7 +19,18 @@ export class HomePageComponent implements OnInit {
   }
 
   geta(){
-    this.httpClient.get<any>('http://localhost:8080/utils/gimme' ).subscribe(Response =>{
+    const headerDict = {
+      'Content-Type': 'application/json',
+      'Authorization': String(localStorage.getItem('Authorization'))
+    }
+    
+    const requestOptions = {                                                                                                                                                                                 
+      headers: new HttpHeaders(headerDict), 
+    };
+    
+    console.log(String(localStorage.getItem('Authorization')))
+
+    this.httpClient.get<any>('http://localhost:8080/Administration/secrets' ,requestOptions).subscribe(Response =>{
       console.log("Response");
       console.log(Response);
       this.homelist=Response
